@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUMINA SKYDINING — Dine Above the City Lights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    /* ── RESET & BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black:   #080810;
+      --deep:    #0d0d1a;
+      --gold:    #c9a84c;
+      --gold-lt: #e8c97a;
+      --gold-dk: #9a7a2e;
+      --purple:  #2a1a4e;
+      --purple-lt: #4a2a8e;
+      --cream:   #f5f0e8;
+      --white:   #ffffff;
+      --glass:   rgba(255,255,255,0.06);
+      --glass-border: rgba(201,168,76,0.2);
+      --text-muted: rgba(245,240,232,0.5);
+      --transition: 0.4s cubic-bezier(0.4,0,0.2,1);
+      /* ambience vars */
+      --sky-top: #080810;
+      --sky-bot: #0d0d1a;
+      --accent:  #c9a84c;
+      --shadow-col: rgba(201,168,76,0.15);
+    }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'Inter', sans-serif;
+      cursor: none;
+      overflow-x: hidden;
+      transition: background 1.2s ease, color 1.2s ease;
+    }
+    img { max-width: 100%; display: block; }
+    a  { text-decoration: none; color: inherit; }
+    button { cursor: none; border: none; background: none; font-family: inherit; }
+
+    /* ── CUSTOM CURSOR ── */
+    #cursor-dot {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 99999;
+      transform: translate(-50%,-50%);
+      transition: transform 0.1s, background 0.3s;
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--gold);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 99998;
+      transform: translate(-50%,-50%);
+      transition: transform 0.18s ease, width 0.3s, height 0.3s, opacity 0.3s;
+      opacity: 0.7;
+    }
+    body:hover #cursor-ring { opacity: 1; }
+
+    /* ── SCROLL PROGRESS ── */
+    #scroll-progress {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--gold-dk), var(--gold), var(--gold-lt));
+      z-index: 9999; width: 0%; transition: width 0.1s linear;
+      box-shadow: 0 0 10px var(--gold);
+    }
+
+    /* ── LOADING SCREEN ── */
+    #loader {
+      position: fixed; inset: 0;
+      background: var(--black);
+      z-index: 99997;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2rem;
+    }
+    #loader .logo-reveal {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      font-weight: 300;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      text-transform: uppercase;
+      overflow: hidden;
+    }
+    #loader .logo-reveal span {
+      display: inline-block;
+      transform: translateY(120%);
+      opacity: 0;
+      animation: letterRise 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    #loader .tagline-reveal {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.35em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeUp 0.5s ease 1.6s forwards;
+    }
+    #loader .loader-line {
+      width: 200px; height: 1px;
+      background: rgba(201,168,76,0.2);
+      position: relative; overflow: hidden;
+    }
+    #loader .loader-line::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--gold);
+      transform: translateX(-100%);
+      animation: lineSlide 1.8s ease 0.3s forwards;
+    }
+    @keyframes letterRise {
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes fadeUp {
+      to { opacity: 1; }
+    }
+    @keyframes lineSlide {
+      to { transform: translateX(0); }
+    }
+    #loader.hidden {
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
+    /* ── FLOATING OFFER BANNER ── */
+    #offer-banner {
+      position: fixed; bottom: 2rem; left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: linear-gradient(135deg, rgba(42,26,78,0.95), rgba(13,13,26,0.98));
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      border-radius: 50px;
+      padding: 0.75rem 1.5rem;
+      z-index: 9000;
+      display: flex; align-items: center; gap: 1rem;
+      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+      white-space: nowrap;
+    }
+    #offer-banner.show { transform: translateX(-50%) translateY(0); }
+    #offer-banner .offer-text {
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+    }
+    #offer-banner .offer-text span { color: var(--gold); font-weight: 600; }
+    #offer-banner .offer-close {
+      color: var(--text-muted); font-size: 1rem; cursor: none;
+      transition: color 0.2s;
+    }
+    #offer-banner .offer-close:hover { color: var(--cream); }
+
+    /* ── NAVBAR ── */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 8000;
+      padding: 1.5rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: all var(--transition);
+    }
+    #navbar.scrolled {
+      background: rgba(8,8,16,0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem 3rem;
+      box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+    }
+    .nav-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .nav-links {
+      display: flex; gap: 2.5rem; list-style: none;
+    }
+    .nav-links a {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color var(--transition);
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0; right: 0;
+      height: 1px; background: var(--gold);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform var(--transition);
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+    .nav-cta {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--black);
+      background: var(--gold);
+      padding: 0.6rem 1.4rem;
+      border-radius: 2px;
+      transition: all var(--transition);
+      box-shadow: 0 0 20px rgba(201,168,76,0.3);
+    }
+    .nav-cta:hover {
+      background: var(--gold-lt);
+      box-shadow: 0 0 30px rgba(201,168,76,0.5);
+      transform: translateY(-1px);
+    }
+    .nav-hamburger {
+      display: none; flex-direction: column;
+      gap: 5px; cursor: none; padding: 4px;
+    }
+    .nav-hamburger span {
+      width: 24px; height: 1.5px;
+      background: var(--gold); display: block;
+      transition: all 0.3s;
+    }
+
+    /* Mobile Nav */
+    #mobile-nav {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(8,8,16,0.98);
+      z-index: 7999;
+      flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2.5rem;
+    }
+    #mobile-nav.open { display: flex; }
+    #mobile-nav a {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 300;
+      letter-spacing: 0.1em;
+      color: var(--cream);
+      transition: color 0.3s;
+    }
+    #mobile-nav a:hover { color: var(--gold); }
+
+    /* ── AMBIENCE SWITCHER ── */
+    #ambience-switcher {
+      position: fixed; right: 2rem; top: 50%;
+      transform: translateY(-50%);
+      z-index: 7000;
+      display: flex; flex-direction: column; gap: 0.6rem;
+    }
+    .amb-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      background: rgba(8,8,16,0.8);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      color: var(--text-muted);
+      transition: all 0.3s;
+      cursor: none;
+    }
+    .amb-btn:hover, .amb-btn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 15px rgba(201,168,76,0.3);
+    }
+
+    /* ── HERO ── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 60%, rgba(42,26,78,0.6) 0%, transparent 70%),
+                  linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bot) 100%);
+      transition: background 1.2s ease;
+    }
+    /* Stars */
+    .stars {
+      position: absolute; inset: 0;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--d, 3s) ease-in-out infinite;
+      opacity: var(--o, 0.6);
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: var(--o); transform: scale(1); }
+      50% { opacity: 0.1; transform: scale(0.5); }
+    }
+    /* City skyline */
+    .city-skyline {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 35%;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%23080810' fill-opacity='1' d='M0,320 L0,200 L40,200 L40,150 L60,150 L60,120 L80,120 L80,100 L100,100 L100,80 L120,80 L120,100 L160,100 L160,60 L180,60 L180,40 L200,40 L200,60 L220,60 L220,80 L240,80 L240,200 L280,200 L280,140 L300,140 L300,100 L320,100 L320,80 L340,80 L340,60 L360,60 L360,80 L380,80 L380,120 L400,120 L400,200 L440,200 L440,160 L460,160 L460,120 L480,120 L480,100 L500,100 L500,80 L520,80 L520,60 L540,60 L540,40 L560,40 L560,20 L580,20 L580,40 L600,40 L600,60 L620,60 L620,80 L640,80 L640,100 L660,100 L660,120 L680,120 L680,160 L700,160 L700,200 L740,200 L740,140 L760,140 L760,100 L800,100 L800,80 L820,80 L820,60 L840,60 L840,80 L860,80 L860,100 L880,100 L880,120 L900,120 L900,200 L940,200 L940,150 L960,150 L960,120 L980,120 L980,100 L1000,100 L1000,80 L1020,80 L1020,60 L1040,60 L1040,40 L1060,40 L1060,60 L1080,60 L1080,80 L1100,80 L1100,100 L1120,100 L1120,140 L1140,140 L1140,200 L1180,200 L1180,160 L1200,160 L1200,130 L1220,130 L1220,100 L1240,100 L1240,80 L1260,80 L1260,60 L1280,60 L1280,80 L1300,80 L1300,100 L1320,100 L1320,120 L1340,120 L1340,160 L1360,160 L1360,200 L1440,200 L1440,320 Z'/%3E%3C/svg%3E") no-repeat bottom center / cover;
+    }
+    /* Building windows glow */
+    .city-lights {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 35%;
+      background: radial-gradient(ellipse at 50% 100%, rgba(201,168,76,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative; z-index: 10;
+      text-align: center;
+      padding: 2rem;
+      max-width: 900px;
+    }
+    .hero-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 2.2s forwards;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(3rem, 10vw, 7.5rem);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: 0.05em;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 1s ease 2.4s forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .hero-sub {
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 2.7s forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 3s forwards;
+    }
+    .btn-gold {
+      padding: 0.9rem 2.2rem;
+      background: var(--gold);
+      color: var(--black);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: all var(--transition);
+      box-shadow: 0 0 30px rgba(201,168,76,0.4);
+      position: relative; overflow: hidden;
+    }
+    .btn-gold::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.2));
+      transform: translateX(-100%);
+      transition: transform 0.4s;
+    }
+    .btn-gold:hover::before { transform: translateX(0); }
+    .btn-gold:hover {
+      background: var(--gold-lt);
+      box-shadow: 0 0 50px rgba(201,168,76,0.6);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      padding: 0.9rem 2.2rem;
+      border: 1px solid rgba(201,168,76,0.4);
+      color: var(--cream);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: all var(--transition);
+    }
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201,168,76,0.05);
+    }
+    /* open/closed + time */
+    .hero-status {
+      position: absolute; bottom: 3rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; align-items: center; gap: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 3.3s forwards;
+    }
+    .status-pill {
+      display: flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      border: 1px solid;
+    }
+    .status-pill.open {
+      background: rgba(52,211,153,0.1);
+      border-color: rgba(52,211,153,0.3);
+      color: #34d399;
+    }
+    .status-pill.closed {
+      background: rgba(239,68,68,0.1);
+      border-color: rgba(239,68,68,0.3);
+      color: #ef4444;
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+    #current-time {
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+    }
+    /* scroll indicator */
+    .scroll-indicator {
+      position: absolute; bottom: 1.5rem; right: 3rem;
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 3.5s forwards;
+    }
+    .scroll-indicator span {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      writing-mode: vertical-rl;
+    }
+    .scroll-line {
+      width: 1px; height: 50px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollLine 2s ease infinite;
+    }
+    @keyframes scrollLine {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      51% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ── SECTIONS BASE ── */
+    section { padding: 8rem 0; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+    .section-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 300;
+      line-height: 1.1;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+    }
+    .section-title em { font-style: italic; color: var(--gold); }
+    .section-line {
+      width: 60px; height: 1px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      margin-bottom: 2rem;
+    }
+
+    /* Reveal animation */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal.visible {
+      opacity: 1; transform: translateY(0);
+    }
+    .reveal-left {
+      opacity: 0; transform: translateX(-40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right {
+      opacity: 0; transform: translateX(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    /* ── ABOUT ── */
+    #about { background: var(--deep); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-image-wrap {
+      position: relative;
+    }
+    .about-img-main {
+      width: 100%;
+      height: 500px;
+      background: linear-gradient(135deg, var(--purple) 0%, rgba(42,26,78,0.3) 100%);
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-img-main::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,0.1), transparent);
+    }
+    .about-img-badge {
+      position: absolute;
+      bottom: -1.5rem; right: -1.5rem;
+      width: 120px; height: 120px;
+      background: var(--gold);
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--black);
+    }
+    .about-img-badge .year {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 600; line-height: 1;
+    }
+    .about-img-badge .since {
+      font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+    }
+    .about-stats {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1.5rem; margin-top: 2.5rem;
+    }
+    .about-stat {
+      padding: 1.5rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 2px;
+    }
+    .about-stat .num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem; font-weight: 300;
+      color: var(--gold); line-height: 1;
+    }
+    .about-stat .label {
+      font-size: 0.68rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+    .about-text p {
+      font-size: 0.95rem; line-height: 1.9;
+      color: var(--text-muted); margin-bottom: 1.2rem;
+    }
+
+    /* ── TODAY'S SPECIAL ── */
+    #todays-special {
+      background: linear-gradient(135deg, rgba(42,26,78,0.3), rgba(8,8,16,0.8));
+      border-top: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--glass-border);
+      padding: 4rem 0;
+    }
+    .special-inner {
+      display: flex; align-items: center; gap: 4rem;
+    }
+    .special-left { flex-shrink: 0; }
+    .special-tag {
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(201,168,76,0.1);
+      border: 1px solid var(--glass-border);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+    .special-dish {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 300; line-height: 1.1;
+      color: var(--cream); margin-bottom: 0.75rem;
+    }
+    .special-desc {
+      font-size: 0.85rem; line-height: 1.7;
+      color: var(--text-muted); max-width: 400px;
+      margin-bottom: 1rem;
+    }
+    .special-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; color: var(--gold);
+    }
+    .special-emoji {
+      font-size: 8rem; flex-shrink: 0;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-15px) rotate(3deg); }
+    }
+
+    /* ── MENU ── */
+    #menu { background: var(--black); }
+    .menu-filters {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+      margin-bottom: 3rem;
+    }
+    .filter-btn {
+      padding: 0.55rem 1.4rem;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: 1px solid rgba(201,168,76,0.2);
+      color: var(--text-muted);
+      border-radius: 50px;
+      transition: all 0.3s;
+      cursor: none;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201,168,76,0.08);
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .menu-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
+    }
+    .menu-card:hover {
+      transform: translateY(-6px) rotate(0.3deg);
+      border-color: rgba(201,168,76,0.4);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(201,168,76,0.1);
+    }
+    .menu-card-img {
+      height: 200px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      background: linear-gradient(135deg, rgba(42,26,78,0.5), rgba(13,13,26,0.8));
+      position: relative; overflow: hidden;
+      transition: transform 0.4s;
+    }
+    .menu-card:hover .menu-card-img { transform: scale(1.05); }
+    .menu-card-img .dish-emoji {
+      transition: transform 0.4s;
+      display: block;
+    }
+    .menu-card:hover .dish-emoji {
+      transform: rotate(5deg) scale(1.1);
+    }
+    .chef-badge {
+      position: absolute; top: 1rem; left: 1rem;
+      background: var(--gold);
+      color: var(--black);
+      font-size: 0.55rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.7rem;
+      border-radius: 50px;
+    }
+    .menu-card-body { padding: 1.5rem; }
+    .menu-card-category {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.4rem;
+    }
+    .menu-card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 0.5rem;
+    }
+    .menu-card-desc {
+      font-size: 0.78rem; line-height: 1.6;
+      color: var(--text-muted); margin-bottom: 1rem;
+    }
+    .menu-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .menu-card-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; color: var(--gold);
+      transition: text-shadow 0.3s;
+    }
+    .menu-card:hover .menu-card-price {
+      text-shadow: 0 0 20px rgba(201,168,76,0.8);
+    }
+    .fav-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.2);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted);
+      transition: all 0.3s;
+      font-size: 0.9rem;
+      cursor: none;
+    }
+    .fav-btn:hover, .fav-btn.active {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: rgba(239,68,68,0.1);
+      transform: scale(1.2);
+    }
+    .menu-card.hidden { display: none; }
+
+    /* Chef Recommendation Wheel */
+    #wheel-section { padding: 4rem 0; background: var(--deep); }
+    .wheel-inner {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 2rem; text-align: center;
+    }
+    .wheel-container { position: relative; }
+    #spin-wheel {
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      position: relative;
+      transition: transform 3s cubic-bezier(0.17,0.67,0.12,0.99);
+      background: conic-gradient(
+        rgba(42,26,78,0.8) 0deg 60deg,
+        rgba(201,168,76,0.15) 60deg 120deg,
+        rgba(42,26,78,0.8) 120deg 180deg,
+        rgba(201,168,76,0.15) 180deg 240deg,
+        rgba(42,26,78,0.8) 240deg 300deg,
+        rgba(201,168,76,0.15) 300deg 360deg
+      );
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+      box-shadow: 0 0 40px rgba(201,168,76,0.2);
+      cursor: none;
+    }
+    .wheel-pointer {
+      position: absolute; top: -16px; left: 50%;
+      transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 20px solid var(--gold);
+    }
+    #wheel-result {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 2rem 2.5rem;
+      max-width: 400px;
+      text-align: center;
+      display: none;
+    }
+    #wheel-result.show { display: block; animation: fadeUp 0.5s ease; }
+    #wheel-result .result-dish {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; color: var(--cream); margin: 0.5rem 0;
+    }
+    #wheel-result .result-detail {
+      font-size: 0.78rem; color: var(--text-muted); line-height: 1.6;
+    }
+    #wheel-result .result-price {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; color: var(--gold); margin-top: 0.5rem;
+    }
+
+    /* ── VIRTUAL TABLE PREVIEW ── */
+    #table-preview { background: var(--black); }
+    .table-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+    }
+    .table-card {
+      padding: 1.8rem;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      text-align: center;
+      cursor: none;
+      transition: all 0.35s;
+    }
+    .table-card:hover, .table-card.selected {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.05);
+      box-shadow: 0 0 30px rgba(201,168,76,0.1);
+      transform: translateY(-4px);
+    }
+    .table-card .t-icon { font-size: 2.8rem; margin-bottom: 0.75rem; }
+    .table-card .t-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; color: var(--cream); margin-bottom: 0.3rem;
+    }
+    .table-card .t-desc {
+      font-size: 0.72rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .table-card .t-avail {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #34d399;
+      margin-top: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      background: rgba(52,211,153,0.08);
+      border: 1px solid rgba(52,211,153,0.2);
+      border-radius: 50px;
+    }
+    #table-visual {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 3rem;
+      text-align: center;
+      min-height: 280px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem;
+      transition: all 0.4s;
+    }
+    #table-visual .tv-emoji { font-size: 6rem; }
+    #table-visual .tv-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; color: var(--cream);
+    }
+    #table-visual .tv-desc { font-size: 0.85rem; color: var(--text-muted); max-width: 400px; }
+
+    /* ── GALLERY ── */
+    #gallery { background: var(--deep); }
+    .gallery-grid {
+      columns: 3; column-gap: 1rem;
+    }
+    .gallery-item {
+      break-inside: avoid;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      border-radius: 2px;
+      cursor: none;
+      position: relative;
+    }
+    .gallery-item .g-inner {
+      height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem;
+      background: linear-gradient(135deg, rgba(42,26,78,0.6), rgba(13,13,26,0.9));
+      transition: transform 0.4s;
+      position: relative;
+    }
+    .gallery-item:nth-child(2n) .g-inner { height: 300px; }
+    .gallery-item:nth-child(3n) .g-inner { height: 180px; }
+    .gallery-item:hover .g-inner { transform: scale(1.03); }
+    .gallery-overlay {
+      position: absolute; inset: 0;
+      background: rgba(8,8,16,0.7);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.4rem;
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    .gallery-overlay .g-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem; color: var(--cream);
+    }
+    .gallery-overlay .g-cat {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold);
+    }
+
+    /* Lightbox */
+    #lightbox {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 90000;
+      display: none;
+      align-items: center; justify-content: center;
+    }
+    #lightbox.open { display: flex; }
+    .lightbox-content {
+      text-align: center; padding: 2rem;
+    }
+    .lightbox-emoji { font-size: 10rem; }
+    .lightbox-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; color: var(--cream); margin-top: 1rem;
+    }
+    .lightbox-close {
+      position: absolute; top: 2rem; right: 2rem;
+      font-size: 2rem; color: var(--text-muted);
+      cursor: none; transition: color 0.2s;
+    }
+    .lightbox-close:hover { color: var(--cream); }
+    .lightbox-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      font-size: 1.5rem; color: var(--gold);
+      cursor: none; padding: 1rem;
+      transition: transform 0.2s;
+    }
+    .lightbox-nav:hover { transform: translateY(-50%) scale(1.2); }
+    #lb-prev { left: 2rem; }
+    #lb-next { right: 2rem; }
+
+    /* ── CHEF ── */
+    #chef { background: var(--black); }
+    .chef-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 5rem; align-items: center;
+    }
+    .chef-portrait {
+      position: relative;
+    }
+    .chef-img {
+      width: 100%; height: 500px;
+      background: linear-gradient(145deg, rgba(42,26,78,0.8), rgba(13,13,26,0.9));
+      border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8rem;
+      border: 1px solid var(--glass-border);
+      position: relative; overflow: hidden;
+    }
+    .chef-award {
+      position: absolute;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      border-radius: 2px;
+      padding: 0.75rem 1rem;
+      font-size: 0.7rem;
+    }
+    .chef-award:nth-child(2) { top: 2rem; right: -2rem; }
+    .chef-award:nth-child(3) { bottom: 2rem; left: -2rem; }
+    .chef-award .award-icon { font-size: 1.2rem; margin-bottom: 0.2rem; }
+    .chef-award .award-text { color: var(--gold); letter-spacing: 0.05em; }
+    .chef-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-style: italic;
+      font-weight: 300;
+      line-height: 1.4;
+      color: var(--cream);
+      border-left: 2px solid var(--gold);
+      padding-left: 1.5rem;
+      margin: 2rem 0;
+    }
+    .chef-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; font-weight: 400; color: var(--cream);
+    }
+    .chef-title { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+
+    /* ── REVIEWS ── */
+    #reviews { background: var(--deep); overflow: hidden; }
+    .reviews-track-wrap {
+      overflow: hidden; margin: 0 -2rem;
+    }
+    .reviews-track {
+      display: flex; gap: 1.5rem;
+      animation: scrollTrack 35s linear infinite;
+      width: max-content;
+    }
+    .reviews-track:hover { animation-play-state: paused; }
+    @keyframes scrollTrack {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .review-card {
+      width: 340px; flex-shrink: 0;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 2rem;
+    }
+    .review-stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 1rem; letter-spacing: 0.1em; }
+    .review-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem; font-style: italic;
+      line-height: 1.6; color: var(--cream);
+      margin-bottom: 1.5rem;
+    }
+    .reviewer {
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .reviewer-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-lt), var(--gold-dk));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 0.9rem; color: var(--cream);
+    }
+    .reviewer-name { font-size: 0.85rem; color: var(--cream); font-weight: 500; }
+    .reviewer-meta { font-size: 0.68rem; color: var(--text-muted); }
+
+    /* Journey Timeline */
+    #journey { background: var(--black); padding: 6rem 0; }
+    .timeline {
+      display: flex; flex-direction: column;
+      gap: 0; position: relative; max-width: 700px; margin: 0 auto;
+    }
+    .timeline::before {
+      content: '';
+      position: absolute; left: 50%; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+      transform: translateX(-50%);
+    }
+    .t-step {
+      display: flex; align-items: center;
+      gap: 2rem; padding: 2rem 0;
+      position: relative;
+    }
+    .t-step:nth-child(even) { flex-direction: row-reverse; text-align: right; }
+    .t-icon-wrap {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--deep);
+      border: 1px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      z-index: 1;
+      box-shadow: 0 0 20px rgba(201,168,76,0.2);
+    }
+    .t-content { flex: 1; }
+    .t-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem; color: var(--cream); margin-bottom: 0.25rem;
+    }
+    .t-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+
+    /* ── RESERVATION ── */
+    #reservation {
+      background: linear-gradient(135deg, rgba(42,26,78,0.4), rgba(8,8,16,0.95));
+      border-top: 1px solid var(--glass-border);
+    }
+    .reservation-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem; align-items: start;
+    }
+    .res-info { }
+    .res-info p { font-size: 0.9rem; line-height: 1.8; color: var(--text-muted); margin-bottom: 2rem; }
+    .res-detail {
+      display: flex; gap: 1rem; margin-bottom: 1.2rem; align-items: flex-start;
+    }
+    .res-detail-icon { color: var(--gold); font-size: 1rem; margin-top: 2px; }
+    .res-detail-text .rd-label {
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 0.15rem;
+    }
+    .res-detail-text .rd-val { font-size: 0.85rem; color: var(--cream); }
+    .res-form {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 4px;
+      padding: 2.5rem;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label {
+      display: block;
+      font-size: 0.62rem; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(201,168,76,0.15);
+      border-radius: 2px;
+      padding: 0.75rem 1rem;
+      color: var(--cream);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.3s;
+      cursor: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(201,168,76,0.1);
+    }
+    .form-group select option { background: var(--deep); }
+    .occasion-pills {
+      display: flex; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .occ-pill {
+      padding: 0.4rem 0.9rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.05em;
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 50px;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      cursor: none;
+    }
+    .occ-pill:hover, .occ-pill.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201,168,76,0.08);
+    }
+    .form-submit {
+      width: 100%; padding: 1rem;
+      background: linear-gradient(135deg, var(--gold-dk), var(--gold));
+      color: var(--black);
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: all 0.3s;
+      font-weight: 600;
+      cursor: none;
+    }
+    .form-submit:hover {
+      box-shadow: 0 0 30px rgba(201,168,76,0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Booking Confirmation Modal */
+    #booking-modal {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(10px);
+      z-index: 80000;
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+    }
+    #booking-modal.open { display: flex; animation: fadeUp 0.4s ease; }
+    .booking-card {
+      background: var(--deep);
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      padding: 3rem;
+      max-width: 480px; width: 100%;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(201,168,76,0.2);
+    }
+    .booking-check {
+      font-size: 4rem; margin-bottom: 1rem;
+      animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .booking-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem; color: var(--cream); margin-bottom: 0.5rem;
+    }
+    .booking-card p {
+      font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem;
+    }
+    .booking-summary {
+      background: rgba(201,168,76,0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 2px;
+      padding: 1.5rem;
+      text-align: left;
+      margin-bottom: 2rem;
+    }
+    .booking-summary-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.8rem; padding: 0.4rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .booking-summary-row:last-child { border-bottom: none; }
+    .booking-summary-row .bs-label { color: var(--text-muted); }
+    .booking-summary-row .bs-val { color: var(--cream); font-weight: 500; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--deep);
+      border-top: 1px solid var(--glass-border);
+      padding: 5rem 0 2rem;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 4rem;
+    }
+    .footer-brand .brand-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem; font-weight: 300;
+      letter-spacing: 0.2em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .footer-brand .brand-tag {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+    .footer-brand p {
+      font-size: 0.82rem; line-height: 1.8; color: var(--text-muted);
+      max-width: 280px; margin-bottom: 1.5rem;
+    }
+    .social-links { display: flex; gap: 0.75rem; }
+    .social-link {
+      width: 38px; height: 38px;
+      border: 1px solid var(--glass-border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-muted); font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+    .social-link:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 15px rgba(201,168,76,0.2);
+      transform: translateY(-2px);
+    }
+    .footer-col h4 {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+    }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 0.75rem; }
+    .footer-col ul li a {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+    .footer-col ul li a:hover { color: var(--cream); }
+    .footer-contact-item {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .footer-contact-item i { color: var(--gold); font-size: 0.85rem; margin-top: 2px; }
+    .footer-contact-item span { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+    .newsletter-form {
+      display: flex; gap: 0;
+      margin-top: 0.75rem;
+    }
+    .newsletter-form input {
+      flex: 1;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-right: none;
+      border-radius: 2px 0 0 2px;
+      padding: 0.65rem 1rem;
+      color: var(--cream);
+      font-size: 0.78rem;
+      outline: none;
+      cursor: none;
+    }
+    .newsletter-form button {
+      background: var(--gold);
+      color: var(--black);
+      padding: 0.65rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      border-radius: 0 2px 2px 0;
+      cursor: none;
+      transition: background 0.2s;
+    }
+    .newsletter-form button:hover { background: var(--gold-lt); }
+    .footer-bottom {
+      border-top: 1px solid var(--glass-border);
+      padding-top: 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-bottom p { font-size: 0.72rem; color: var(--text-muted); }
+    .footer-bottom span { color: var(--gold); }
+
+    /* ── BACK TO TOP ── */
+    #back-top {
+      position: fixed; bottom: 2rem; right: 2rem;
+      width: 44px; height: 44px;
+      background: rgba(8,8,16,0.9);
+      border: 1px solid var(--glass-border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold); font-size: 1rem;
+      z-index: 6000;
+      opacity: 0; pointer-events: none;
+      transition: all 0.3s;
+      cursor: none;
+      backdrop-filter: blur(10px);
+    }
+    #back-top.show { opacity: 1; pointer-events: auto; }
+    #back-top:hover {
+      background: var(--gold);
+      color: var(--black);
+      box-shadow: 0 0 20px rgba(201,168,76,0.4);
+    }
+
+    /* ── AMBIENCE MODES ── */
+    body.day {
+      --sky-top: #1a3a5c;
+      --sky-bot: #2a5a8c;
+      --accent:  #f0b429;
+      --shadow-col: rgba(240,180,41,0.15);
+    }
+    body.day .hero-bg {
+      background: radial-gradient(ellipse at 50% 40%, rgba(240,180,41,0.3) 0%, transparent 60%),
+                  linear-gradient(180deg, #1a3a5c 0%, #2a5a8c 50%, #1a3a5c 100%);
+    }
+    body.sunset {
+      --sky-top: #1a0a2e;
+      --sky-bot: #8b2500;
+      --accent:  #ff6b35;
+      --shadow-col: rgba(255,107,53,0.15);
+    }
+    body.sunset .hero-bg {
+      background: radial-gradient(ellipse at 50% 70%, rgba(255,107,53,0.4) 0%, transparent 60%),
+                  linear-gradient(180deg, #1a0a2e 0%, #8b2500 60%, #1a0a2e 100%);
+    }
+
+    /* ── WEATHER SUGGESTION ── */
+    #weather-suggestion {
+      position: fixed; top: 5rem; left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: rgba(8,8,16,0.95);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(20px);
+      border-radius: 50px;
+      padding: 0.65rem 1.5rem;
+      z-index: 8500;
+      font-size: 0.75rem;
+      color: var(--cream);
+      transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+      white-space: nowrap;
+    }
+    #weather-suggestion.show { transform: translateX(-50%) translateY(0); }
+    #weather-suggestion span { color: var(--gold); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .chef-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .reservation-grid { grid-template-columns: 1fr; gap: 3rem; }
+    }
+    @media (max-width: 768px) {
+      #navbar { padding: 1.2rem 1.5rem; }
+      #navbar.scrolled { padding: 0.9rem 1.5rem; }
+      .nav-links { display: none; }
+      .nav-cta { display: none; }
+      .nav-hamburger { display: flex; }
+      #ambience-switcher { display: none; }
+      .gallery-grid { columns: 2; }
+      .table-options { grid-template-columns: 1fr 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+      .timeline::before { left: 30px; }
+      .t-step, .t-step:nth-child(even) { flex-direction: row; text-align: left; }
+      .special-inner { flex-direction: column; gap: 2rem; text-align: center; }
+      .special-emoji { order: -1; }
+    }
+    @media (max-width: 480px) {
+      section { padding: 5rem 0; }
+      .gallery-grid { columns: 1; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .table-options { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; align-items: center; }
+      .hero-status { flex-direction: column; gap: 0.75rem; }
+      #offer-banner { width: 90%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- SCROLL PROGRESS -->
+  <div id="scroll-progress"></div>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="logo-reveal" id="loader-letters"></div>
+    <div class="loader-line"></div>
+    <div class="tagline-reveal">Rooftop Fine Dining · Hyderabad</div>
+  </div>
+
+  <!-- WEATHER SUGGESTION -->
+  <div id="weather-suggestion">
+    🌙 <span>Tonight's pick:</span> Black Truffle Risotto pairs perfectly with the cool evening air.
+  </div>
+
+  <!-- OFFER BANNER -->
+  <div id="offer-banner">
+    <span class="offer-text">✨ <span>20% OFF</span> on all bookings this weekend · Use code <span>LUMINA20</span></span>
+    <button class="offer-close" onclick="document.getElementById('offer-banner').style.display='none'">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo">Lumina</a>
+    <ul class="nav-links">
+      <li><a href="#about">Our Story</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#chef">Chef</a></li>
+      <li><a href="#reviews">Reviews</a></li>
+      <li><a href="#reservation">Reserve</a></li>
+    </ul>
+    <a href="#reservation" class="nav-cta">Reserve a Table</a>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE NAV -->
+  <div id="mobile-nav">
+    <a href="#about" class="mob-link">Our Story</a>
+    <a href="#menu" class="mob-link">Menu</a>
+    <a href="#gallery" class="mob-link">Gallery</a>
+    <a href="#chef" class="mob-link">Chef</a>
+    <a href="#reviews" class="mob-link">Reviews</a>
+    <a href="#reservation" class="mob-link">Reserve</a>
+  </div>
+
+  <!-- AMBIENCE SWITCHER -->
+  <div id="ambience-switcher">
+    <button class="amb-btn" data-mode="night" title="Night">🌙</button>
+    <button class="amb-btn" data-mode="sunset" title="Sunset">🌇</button>
+    <button class="amb-btn" data-mode="day" title="Day">☀️</button>
+  </div>
+
+  <!-- ══ HERO ══ -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="stars" id="stars"></div>
+    <div class="city-skyline"></div>
+    <div class="city-lights"></div>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow">Hyderabad's Premier Rooftop Dining</p>
+      <h1 class="hero-title">Dine Above<br><em>the City Lights</em></h1>
+      <p class="hero-sub">An evening you will never forget</p>
+      <div class="hero-actions">
+        <a href="#reservation" class="btn-gold">Reserve a Table</a>
+        <a href="#menu" class="btn-outline">Explore Menu</a>
+      </div>
+    </div>
+
+    <div class="hero-status">
+      <div class="status-pill open" id="open-status">
+        <span class="status-dot"></span>
+        <span id="open-text">Open Now</span>
+      </div>
+      <div id="current-time"></div>
+    </div>
+
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ══ TODAY'S SPECIAL ══ -->
+  <div id="todays-special">
+    <div class="container">
+      <div class="special-inner reveal">
+        <div class="special-left">
+          <span class="special-tag">🌟 Today's Special</span>
+          <h2 class="special-dish" id="special-dish">Truffle Butter Lobster</h2>
+          <p class="special-desc" id="special-desc">Fresh Atlantic lobster, slow-cooked in a rich truffle butter sauce, served with saffron risotto and micro herbs.</p>
+          <p class="special-price" id="special-price">₹ 2,800</p>
+        </div>
+        <div class="special-emoji" id="special-emoji">🦞</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ABOUT ══ -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image-wrap reveal-left">
+          <div class="about-img-main">🌃</div>
+          <div class="about-img-badge">
+            <span class="year">12</span>
+            <span class="since">Years</span>
+          </div>
+        </div>
+        <div class="about-content reveal-right">
+          <span class="section-eyebrow">Our Story</span>
+          <h2 class="section-title">Where Every<br><em>Meal Becomes</em><br>A Memory</h2>
+          <div class="section-line"></div>
+          <div class="about-text">
+            <p>Perched 22 floors above the bustling streets of Hyderabad, LUMINA SKYDINING was born from a singular vision — to create a dining destination that transcends the ordinary.</p>
+            <p>Our culinary team, led by Executive Chef Arjun Mehta, blends the finest global techniques with the rich heritage of Indian flavours, crafting dishes that tell a story with every bite.</p>
+            <p>From the moment you step into our rooftop haven, the city skyline becomes your backdrop, the stars your ceiling, and the food — a journey you will savour long after the last course.</p>
+          </div>
+          <div class="about-stats">
+            <div class="about-stat"><p class="num">22F</p><p class="label">Rooftop Level</p></div>
+            <div class="about-stat"><p class="num">200+</p><p class="label">Signature Dishes</p></div>
+            <div class="about-stat"><p class="num">50K+</p><p class="label">Happy Guests</p></div>
+            <div class="about-stat"><p class="num">12</p><p class="label">Awards Won</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MENU ══ -->
+  <section id="menu">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-eyebrow">Culinary Creations</span>
+        <h2 class="section-title">Our <em>Signature</em> Menu</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="menu-filters reveal">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="starters">Starters</button>
+        <button class="filter-btn" data-filter="mains">Mains</button>
+        <button class="filter-btn" data-filter="desserts">Desserts</button>
+        <button class="filter-btn" data-filter="drinks">Drinks</button>
+      </div>
+      <div class="menu-grid" id="menu-grid"></div>
+    </div>
+  </section>
+
+  <!-- ══ CHEF WHEEL ══ -->
+  <div id="wheel-section">
+    <div class="container">
+      <div class="wheel-inner">
+        <div class="reveal" style="text-align:center">
+          <span class="section-eyebrow">Chef's Pick</span>
+          <h2 class="section-title"><em>Surprise</em> Me</h2>
+          <p style="font-size:0.85rem;color:var(--text-muted);max-width:400px;margin:0 auto 2rem">Can't decide? Spin the wheel and let Chef Arjun choose your next favourite dish.</p>
+        </div>
+        <div class="wheel-container">
+          <div class="wheel-pointer"></div>
+          <div id="spin-wheel" onclick="spinWheel()">🍽️</div>
+        </div>
+        <button class="btn-gold" onclick="spinWheel()" style="margin-top:1rem">🎲 Spin the Wheel</button>
+        <div id="wheel-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIRTUAL TABLE PREVIEW ══ -->
+  <section id="table-preview">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-eyebrow">Choose Your Experience</span>
+        <h2 class="section-title">Virtual <em>Table</em> Preview</h2>
+        <div class="section-line"></div>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:3rem;max-width:500px">Select your preferred seating and preview the experience before you arrive.</p>
+      </div>
+      <div class="table-options" id="table-options"></div>
+      <div id="table-visual">
+        <div class="tv-emoji">🪑</div>
+        <div class="tv-name">Select a Table Above</div>
+        <div class="tv-desc">Choose from our exclusive seating options to preview your dining experience.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ GALLERY ══ -->
+  <section id="gallery">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-eyebrow">Visual Stories</span>
+        <h2 class="section-title">The <em>Gallery</em></h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </div>
+  </section>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox">
+    <button class="lightbox-close" id="lb-close"><i class="fa-solid fa-xmark"></i></button>
+    <button class="lightbox-nav" id="lb-prev"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="lightbox-content" id="lb-content"></div>
+    <button class="lightbox-nav" id="lb-next"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <!-- ══ CHEF ══ -->
+  <section id="chef">
+    <div class="container">
+      <div class="chef-grid">
+        <div class="chef-portrait reveal-left">
+          <div class="chef-img">👨‍🍳
+            <div class="chef-award">
+              <div class="award-icon">⭐</div>
+              <div class="award-text">Michelin Recommended</div>
+            </div>
+            <div class="chef-award">
+              <div class="award-icon">🏆</div>
+              <div class="award-text">Chef of the Year 2023</div>
+            </div>
+          </div>
+        </div>
+        <div class="chef-info reveal-right">
+          <span class="section-eyebrow">The Artist</span>
+          <p class="chef-title">Executive Chef</p>
+          <h2 class="chef-name">Arjun Mehta</h2>
+          <blockquote class="chef-quote">
+            "Cooking is not just a skill — it is a conversation between the chef and the soul of the ingredient."
+          </blockquote>
+          <div class="about-text">
+            <p>With over 18 years of culinary mastery spanning Paris, Tokyo, and New York, Chef Arjun returned to his roots in Hyderabad to create something truly extraordinary — a menu that honours tradition while fearlessly embracing innovation.</p>
+            <p>His signature style — elegant minimalism with explosive flavour — has earned LUMINA a place among India's top 10 fine dining restaurants for three consecutive years.</p>
+          </div>
+          <a href="#menu" class="btn-outline" style="display:inline-block;margin-top:1.5rem">Explore His Creations</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ REVIEWS ══ -->
+  <section id="reviews">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:4rem">
+        <span class="section-eyebrow">Guest Voices</span>
+        <h2 class="section-title">What Our <em>Guests</em> Say</h2>
+        <div class="section-line" style="margin:0 auto 0"></div>
+      </div>
+    </div>
+    <div class="reviews-track-wrap">
+      <div class="reviews-track" id="reviews-track"></div>
+    </div>
+  </section>
+
+  <!-- ══ CUSTOMER JOURNEY ══ -->
+  <section id="journey">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:4rem">
+        <span class="section-eyebrow">The Experience</span>
+        <h2 class="section-title">Your <em>Evening</em> at Lumina</h2>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </section>
+
+  <!-- ══ RESERVATION ══ -->
+  <section id="reservation">
+    <div class="container">
+      <div class="reservation-grid">
+        <div class="res-info reveal-left">
+          <span class="section-eyebrow">Book a Table</span>
+          <h2 class="section-title">Reserve Your<br><em>Rooftop</em> Experience</h2>
+          <div class="section-line"></div>
+          <p>Whether it's an intimate dinner for two or a grand celebration, we craft every evening to be uniquely yours. Reservations are recommended to guarantee your preferred table.</p>
+          <div class="res-detail">
+            <i class="fa-regular fa-clock res-detail-icon"></i>
+            <div class="res-detail-text">
+              <p class="rd-label">Opening Hours</p>
+              <p class="rd-val">Mon – Fri: 6:00 PM – 12:00 AM</p>
+              <p class="rd-val">Sat – Sun: 5:00 PM – 1:00 AM</p>
+            </div>
+          </div>
+          <div class="res-detail">
+            <i class="fa-solid fa-location-dot res-detail-icon"></i>
+            <div class="res-detail-text">
+              <p class="rd-label">Location</p>
+              <p class="rd-val">22nd Floor, The Lumina Tower</p>
+              <p class="rd-val">Banjara Hills, Hyderabad – 500034</p>
+            </div>
+          </div>
+          <div class="res-detail">
+            <i class="fa-solid fa-phone res-detail-icon"></i>
+            <div class="res-detail-text">
+              <p class="rd-label">Reservations</p>
+              <p class="rd-val">+91 40 6600 7700</p>
+              <p class="rd-val">hello@luminaskydining.com</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="res-form reveal-right">
+          <form id="reservation-form" onsubmit="submitReservation(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="res-fname" placeholder="Arjun" required />
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="res-lname" placeholder="Mehta" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="res-date" required />
+              </div>
+              <div class="form-group">
+                <label>Time</label>
+                <select id="res-time" required>
+                  <option value="">Select time</option>
+                  <option>6:00 PM</option><option>6:30 PM</option>
+                  <option>7:00 PM</option><option>7:30 PM</option>
+                  <option>8:00 PM</option><option>8:30 PM</option>
+                  <option>9:00 PM</option><option>9:30 PM</option>
+                  <option>10:00 PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Guests</label>
+                <select id="res-guests" required>
+                  <option value="">Select</option>
+                  <option>1 Guest</option><option>2 Guests</option>
+                  <option>3 Guests</option><option>4 Guests</option>
+                  <option>5 Guests</option><option>6+ Guests</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="res-phone" placeholder="+91 98765 43210" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Seating Preference</label>
+              <select id="res-seat">
+                <option>Window Table</option>
+                <option>Rooftop Open Air</option>
+                <option>Private Booth</option>
+                <option>VIP Lounge</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Special Occasion</label>
+              <div class="occasion-pills" id="occasion-pills">
+                <button type="button" class="occ-pill" data-occ="Birthday 🎂">Birthday 🎂</button>
+                <button type="button" class="occ-pill" data-occ="Anniversary ❤️">Anniversary ❤️</button>
+                <button type="button" class="occ-pill" data-occ="Business 💼">Business 💼</button>
+                <button type="button" class="occ-pill" data-occ="Proposal 💍">Proposal 💍</button>
+                <button type="button" class="occ-pill" data-occ="None">Just Dining</button>
+              </div>
+            </div>
+            <button type="submit" class="form-submit">Confirm Reservation</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING MODAL -->
+  <div id="booking-modal">
+    <div class="booking-card">
+      <div class="booking-check">✨</div>
+      <h3>Reservation Confirmed!</h3>
+      <p>Your table has been reserved. We look forward to welcoming you to LUMINA SKYDINING.</p>
+      <div class="booking-summary" id="booking-summary"></div>
+      <button class="btn-gold" onclick="document.getElementById('booking-modal').classList.remove('open')" style="width:100%">
+        Wonderful, Thank You!
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <p class="brand-name">Lumina</p>
+          <p class="brand-tag">Skydining · Hyderabad</p>
+          <p>Perched 22 floors above the city, LUMINA offers an unparalleled fine dining experience where world-class cuisine meets the breathtaking Hyderabad skyline.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Experience</h4>
+          <ul>
+            <li><a href="#menu">Our Menu</a></li>
+            <li><a href="#table-preview">Table Preview</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#chef">Meet the Chef</a></li>
+            <li><a href="#journey">Guest Journey</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Visit Us</h4>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>22nd Floor, Lumina Tower, Banjara Hills, Hyderabad</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-phone"></i>
+            <span>+91 40 6600 7700</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-regular fa-envelope"></i>
+            <span>hello@luminaskydining.com</span>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Newsletter</h4>
+          <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.6;margin-bottom:0.75rem">Get exclusive offers and seasonal menu updates.</p>
+          <div class="newsletter-form">
+            <input type="email" placeholder="your@email.com" />
+            <button onclick="alert('Thank you for subscribing!')">→</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 <span>LUMINA SKYDINING</span>. All rights reserved.</p>
+        <p>Crafted with <span>♥</span> · Future Interns Project</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- BACK TO TOP -->
+  <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fa-solid fa-chevron-up"></i>
+  </button>
+
+  <script>
+  // ── DATA ──
+  const menuItems = [
+    { id:1, name:"Truffle Mushroom Crostini", cat:"starters", emoji:"🍄", desc:"Wild mushrooms, aged parmesan, white truffle oil on toasted sourdough.", price:"₹ 850", chef:true },
+    { id:2, name:"Saffron Lobster Bisque", cat:"starters", emoji:"🦞", desc:"Velvety bisque of Atlantic lobster, saffron cream and cognac.", price:"₹ 1,100", chef:false },
+    { id:3, name:"Burrata & Heirloom Tomato", cat:"starters", emoji:"🍅", desc:"Creamy burrata, heirloom tomatoes, basil oil, sea salt flakes.", price:"₹ 780", chef:false },
+    { id:4, name:"Pan-Seared Duck Breast", cat:"mains", emoji:"🦆", desc:"Orange jus, pomme purée, roasted baby carrots, thyme crumble.", price:"₹ 2,400", chef:true },
+    { id:5, name:"Black Truffle Risotto", cat:"mains", emoji:"🍚", desc:"Carnaroli rice, 24-month Parmigiano, shaved black truffle, chives.", price:"₹ 1,900", chef:false },
+    { id:6, name:"Himalayan Lamb Rack", cat:"mains", emoji:"🥩", desc:"Herb-crusted, mint jelly, roasted garlic dauphinoise, chimichurri.", price:"₹ 3,200", chef:true },
+    { id:7, name:"Miso-Glazed Sea Bass", cat:"mains", emoji:"🐟", desc:"White miso glaze, jasmine rice, pickled cucumber, sesame dashi.", price:"₹ 2,600", chef:false },
+    { id:8, name:"Warm Chocolate Fondant", cat:"desserts", emoji:"🍫", desc:"70% Valrhona dark chocolate, vanilla bean ice cream, gold leaf.", price:"₹ 950", chef:true },
+    { id:9, name:"Mango Saffron Panna Cotta", cat:"desserts", emoji:"🥭", desc:"Alphonso mango coulis, saffron cream, pistachio praline.", price:"₹ 780", chef:false },
+    { id:10, name:"Gold Leaf Tiramisu", cat:"desserts", emoji:"☕", desc:"Mascarpone, espresso-soaked ladyfingers, cocoa dust, edible gold.", price:"₹ 850", chef:false },
+    { id:11, name:"Elderflower Spritz", cat:"drinks", emoji:"🌸", desc:"Elderflower cordial, sparkling water, cucumber, fresh mint.", price:"₹ 480", chef:false },
+    { id:12, name:"Mango Chilli Margarita", cat:"drinks", emoji:"🥭", desc:"Alphonso mango, jalapeño, fresh lime, Tajín rim.", price:"₹ 620", chef:true },
+    { id:13, name:"Royal Masala Chai", cat:"drinks", emoji:"🍵", desc:"Hand-blended Darjeeling, cardamom, saffron, rose petals, cream.", price:"₹ 320", chef:false },
+  ];
+
+  const tableData = [
+    { id:"window", icon:"🪟", name:"Window Table", desc:"Panoramic city views, intimate lighting, perfect for couples.", avail:"4 tables available" },
+    { id:"rooftop", icon:"🌃", name:"Rooftop Open Air", desc:"Under the stars, open sky, gentle breeze — the full LUMINA experience.", avail:"6 tables available" },
+    { id:"booth", icon:"🛋️", name:"Private Booth", desc:"Plush seating, soundproofing, dedicated butler service.", avail:"2 booths available" },
+    { id:"vip", icon:"👑", name:"VIP Lounge", desc:"Exclusive terrace, priority service, personalised chef menu.", avail:"1 suite available" },
+  ];
+
+  const tableVisuals = {
+    window:  { emoji:"🪟", name:"Window Table", desc:"Dramatic floor-to-ceiling city views. Watch the city glow as you dine in style." },
+    rooftop: { emoji:"🌃", name:"Rooftop Open Air", desc:"The full sky above you, the city below. Pure magic under a canopy of stars." },
+    booth:   { emoji:"🛋️", name:"Private Booth", desc:"Your own intimate world. A haven of privacy and absolute luxury." },
+    vip:     { emoji:"👑", name:"VIP Lounge", desc:"The pinnacle of fine dining. Exclusive terrace, personal chef, unmatched views." },
+  };
+
+  const galleryItems = [
+    { emoji:"🦞", label:"Saffron Lobster", cat:"Signature" },
+    { emoji:"🥩", label:"Himalayan Lamb", cat:"Mains" },
+    { emoji:"🍫", label:"Chocolate Fondant", cat:"Desserts" },
+    { emoji:"🌃", label:"Rooftop View", cat:"Ambience" },
+    { emoji:"🍚", label:"Truffle Risotto", cat:"Signature" },
+    { emoji:"🌸", label:"Garden Gallery", cat:"Ambience" },
+    { emoji:"🦆", label:"Duck Breast", cat:"Mains" },
+    { emoji:"☕", label:"Gold Tiramisu", cat:"Desserts" },
+    { emoji:"🥭", label:"Mango Panna Cotta", cat:"Desserts" },
+  ];
+
+  const reviews = [
+    { text:"Absolutely breathtaking. The rooftop view combined with the truffle risotto was an experience I will cherish forever.", name:"Priya Sharma", meta:"Verified Guest · May 2025", stars:5 },
+    { text:"LUMINA raised the bar for fine dining in Hyderabad. Chef Arjun's duck breast is the best dish I've ever tasted.", name:"Rahul Verma", meta:"Food Critic · April 2025", stars:5 },
+    { text:"Our anniversary dinner was pure magic. The team decorated our table beautifully without even being asked. Exceptional!", name:"Sunita & Karan", meta:"Anniversary Guests · March 2025", stars:5 },
+    { text:"The ambience switch feature at the entrance — moving from Day to Night view — is absolutely genius. Unforgettable evening.", name:"Deepika Reddy", meta:"Verified Guest · June 2025", stars:5 },
+    { text:"Michelin quality at its finest, right here in Hyderabad. The saffron lobster bisque deserves its own award.", name:"Aditya Nair", meta:"Food Blogger · May 2025", stars:5 },
+    { text:"From the moment we arrived to the last bite of the chocolate fondant, every second was perfection. Will be back monthly.", name:"Meera Pillai", meta:"Verified Guest · April 2025", stars:5 },
+  ];
+
+  const journeySteps = [
+    { icon:"🚗", label:"Arrival", desc:"Valet parking and a warm welcome from our host team." },
+    { icon:"🍷", label:"Welcome Drink", desc:"A signature LUMINA cocktail as you are seated at your table." },
+    { icon:"📖", label:"Menu Presentation", desc:"Chef Arjun's personal menu introduction, curated for the evening." },
+    { icon:"🍽️", label:"Dinner", desc:"A symphony of flavours, courses crafted with intention and artistry." },
+    { icon:"🍰", label:"Dessert", desc:"Sweet finales that linger — the gold-leaf tiramisu awaits." },
+    { icon:"🌃", label:"Sky View", desc:"Step out to the open terrace. The city glows beneath you." },
+    { icon:"❤️", label:"Happy Memories", desc:"An evening you carry home in your heart, always." },
+  ];
+
+  const wheelDishes = [
+    { emoji:"🦞", dish:"Saffron Lobster Bisque", detail:"Rich, velvety, deeply luxurious. A bowl of pure indulgence.", price:"₹ 1,100", pairing:"Elderflower Spritz" },
+    { emoji:"🥩", dish:"Himalayan Lamb Rack", detail:"Herb-crusted perfection with chimichurri and dauphinoise.", price:"₹ 3,200", pairing:"Red Wine Selection" },
+    { emoji:"🍫", dish:"Warm Chocolate Fondant", detail:"Molten Valrhona centre, vanilla ice cream, edible gold.", price:"₹ 950", pairing:"Masala Chai" },
+    { emoji:"🍚", dish:"Black Truffle Risotto", detail:"Carnaroli rice, aged parmesan, shaved black truffle.", price:"₹ 1,900", pairing:"Elderflower Spritz" },
+    { emoji:"🦆", dish:"Pan-Seared Duck Breast", detail:"Orange jus, pomme purée, roasted baby carrots.", price:"₹ 2,400", pairing:"Mango Margarita" },
+    { emoji:"🥭", dish:"Mango Saffron Panna Cotta", detail:"Light, fragrant, a tropical dream of a dessert.", price:"₹ 780", pairing:"Royal Masala Chai" },
+  ];
+
+  const todaySpecials = [
+    { dish:"Truffle Butter Lobster", desc:"Fresh Atlantic lobster in truffle butter with saffron risotto.", price:"₹ 2,800", emoji:"🦞" },
+    { dish:"Black Pepper Wagyu", desc:"A5 Wagyu beef, black pepper crust, roasted bone marrow jus.", price:"₹ 4,500", emoji:"🥩" },
+    { dish:"Chef's Saffron Prawn", desc:"Tiger prawns, gold saffron bisque, charred brioche.", price:"₹ 1,800", emoji:"🍤" },
+  ];
+
+  // ── INIT ──
+  let favs = JSON.parse(localStorage.getItem('lumina-favs') || '[]');
+  let selectedOccasion = '';
+  let currentLbIndex = 0;
+  let wheelSpinning = false;
+
+  // Loader
+  window.addEventListener('load', () => {
+    const letters = 'LUMINA'.split('');
+    const wrap = document.getElementById('loader-letters');
+    letters.forEach((l, i) => {
+      const s = document.createElement('span');
+      s.textContent = l;
+      s.style.animationDelay = `${0.15 + i * 0.1}s`;
+      wrap.appendChild(s);
+    });
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+      setTimeout(() => {
+        document.getElementById('loader').style.display = 'none';
+        showWeather();
+        setTimeout(() => document.getElementById('offer-banner').classList.add('show'), 1200);
+      }, 800);
+    }, 2800);
+  });
+
+  // Stars
+  (function createStars() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 70 + '%';
+      s.style.setProperty('--d', (2 + Math.random() * 4) + 's');
+      s.style.setProperty('--o', (0.3 + Math.random() * 0.7).toString());
+      s.style.animationDelay = Math.random() * 4 + 's';
+      s.style.width = s.style.height = (1 + Math.random() * 2) + 'px';
+      container.appendChild(s);
+    }
+  })();
+
+  // Custom cursor
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = mx+'px'; dot.style.top = my+'px'; });
+  (function animRing() {
+    rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15;
+    ring.style.left = rx+'px'; ring.style.top = ry+'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  // Scroll progress + navbar + back to top
+  window.addEventListener('scroll', () => {
+    const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+    document.getElementById('scroll-progress').style.width = pct + '%';
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+    document.getElementById('back-top').classList.toggle('show', window.scrollY > 400);
+    revealOnScroll();
+  });
+
+  // Reveal on scroll
+  function revealOnScroll() {
+    document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => {
+      if (el.getBoundingClientRect().top < window.innerHeight - 80) el.classList.add('visible');
+    });
+  }
+  revealOnScroll();
+
+  // Clock + Open/Closed
+  function updateTime() {
+    const now = new Date();
+    const h = now.getHours(), m = now.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const hh = h % 12 || 12;
+    const mm = String(m).padStart(2,'0');
+    document.getElementById('current-time').textContent = `${hh}:${mm} ${ampm} IST`;
+    const open = (h >= 18) || (h === 0 && m < 60);
+    const pill = document.getElementById('open-status');
+    pill.className = 'status-pill ' + (open ? 'open' : 'closed');
+    document.getElementById('open-text').textContent = open ? 'Open Now' : 'Opens at 6 PM';
+  }
+  updateTime(); setInterval(updateTime, 60000);
+
+  // Today's Special (random)
+  const sp = todaySpecials[Math.floor(Math.random() * todaySpecials.length)];
+  document.getElementById('special-dish').textContent = sp.dish;
+  document.getElementById('special-desc').textContent = sp.desc;
+  document.getElementById('special-price').textContent = sp.price;
+  document.getElementById('special-emoji').textContent = sp.emoji;
+
+  // Weather suggestion (simulated)
+  function showWeather() {
+    const h = new Date().getHours();
+    const ws = document.getElementById('weather-suggestion');
+    if (h >= 20 || h < 6) ws.innerHTML = '🌙 <span>Cool night ahead:</span> Perfect for our Himalayan Lamb Rack.';
+    else if (h >= 17) ws.innerHTML = '🌅 <span>Golden hour:</span> Rooftop Open Air seating is calling your name.';
+    else ws.innerHTML = '☀️ <span>Beautiful day:</span> Book our Window Table for tonight\'s sunset.';
+    ws.classList.add('show');
+    setTimeout(() => ws.classList.remove('show'), 6000);
+  }
+
+  // Hamburger
+  document.getElementById('hamburger').addEventListener('click', () => {
+    document.getElementById('mobile-nav').classList.toggle('open');
+  });
+  document.querySelectorAll('.mob-link').forEach(l => {
+    l.addEventListener('click', () => document.getElementById('mobile-nav').classList.remove('open'));
+  });
+
+  // Ambience switcher
+  document.querySelectorAll('.amb-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.amb-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.body.className = btn.dataset.mode === 'night' ? '' : btn.dataset.mode;
+    });
+  });
+  document.querySelector('[data-mode="night"]').classList.add('active');
+
+  // Menu
+  function renderMenu(filter = 'all') {
+    const grid = document.getElementById('menu-grid');
+    grid.innerHTML = menuItems
+      .filter(i => filter === 'all' || i.cat === filter)
+      .map(i => `
+        <div class="menu-card reveal">
+          <div class="menu-card-img">
+            ${i.chef ? '<span class="chef-badge">Chef\'s Special</span>' : ''}
+            <span class="dish-emoji">${i.emoji}</span>
+          </div>
+          <div class="menu-card-body">
+            <p class="menu-card-category">${i.cat}</p>
+            <h3 class="menu-card-name">${i.name}</h3>
+            <p class="menu-card-desc">${i.desc}</p>
+            <div class="menu-card-footer">
+              <span class="menu-card-price">${i.price}</span>
+              <button class="fav-btn ${favs.includes(i.id) ? 'active' : ''}" onclick="toggleFav(${i.id}, this)">
+                <i class="fa${favs.includes(i.id) ? 's' : 'r'} fa-heart"></i>
+              </button>
+            </div>
+          </div>
+        </div>`).join('');
+    setTimeout(revealOnScroll, 50);
+  }
+  renderMenu();
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMenu(btn.dataset.filter);
+    });
+  });
+
+  function toggleFav(id, btn) {
+    if (favs.includes(id)) { favs = favs.filter(f => f !== id); btn.classList.remove('active'); btn.innerHTML = '<i class="far fa-heart"></i>'; }
+    else { favs.push(id); btn.classList.add('active'); btn.innerHTML = '<i class="fas fa-heart"></i>'; }
+    localStorage.setItem('lumina-favs', JSON.stringify(favs));
+  }
+
+  // Spin wheel
+  function spinWheel() {
+    if (wheelSpinning) return;
+    wheelSpinning = true;
+    const wheel = document.getElementById('spin-wheel');
+    const deg = 1440 + Math.floor(Math.random() * 360);
+    wheel.style.transform = `rotate(${deg}deg)`;
+    setTimeout(() => {
+      const pick = wheelDishes[Math.floor(Math.random() * wheelDishes.length)];
+      const res = document.getElementById('wheel-result');
+      res.className = 'show';
+      res.innerHTML = `
+        <div style="font-size:3.5rem;margin-bottom:0.5rem">${pick.emoji}</div>
+        <div class="result-dish">${pick.dish}</div>
+        <div class="result-detail">${pick.detail}<br><br>🍷 Best paired with: <strong style="color:var(--gold)">${pick.pairing}</strong></div>
+        <div class="result-price">${pick.price}</div>`;
+      wheelSpinning = false;
+    }, 3100);
+  }
+
+  // Table Preview
+  (function renderTables() {
+    const wrap = document.getElementById('table-options');
+    wrap.innerHTML = tableData.map(t => `
+      <div class="table-card" onclick="selectTable('${t.id}', this)">
+        <div class="t-icon">${t.icon}</div>
+        <div class="t-name">${t.name}</div>
+        <div class="t-desc">${t.desc}</div>
+        <div class="t-avail"><span style="width:6px;height:6px;background:#34d399;border-radius:50%;display:inline-block"></span> ${t.avail}</div>
+      </div>`).join('');
+  })();
+
+  function selectTable(id, el) {
+    document.querySelectorAll('.table-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    const v = tableVisuals[id];
+    document.getElementById('table-visual').innerHTML = `
+      <div class="tv-emoji" style="animation:float 4s ease-in-out infinite">${v.emoji}</div>
+      <div class="tv-name">${v.name}</div>
+      <div class="tv-desc">${v.desc}</div>
+      <a href="#reservation" class="btn-gold" style="margin-top:1rem;display:inline-block">Reserve This Table</a>`;
+  }
+
+  // Gallery
+  (function renderGallery() {
+    document.getElementById('gallery-grid').innerHTML = galleryItems.map((g, i) => `
+      <div class="gallery-item reveal" onclick="openLightbox(${i})">
+        <div class="g-inner">
+          ${g.emoji}
+          <div class="gallery-overlay">
+            <div class="g-label">${g.label}</div>
+            <div class="g-cat">${g.cat}</div>
+          </div>
+        </div>
+      </div>`).join('');
+  })();
+
+  function openLightbox(i) {
+    currentLbIndex = i;
+    showLb();
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function showLb() {
+    const g = galleryItems[currentLbIndex];
+    document.getElementById('lb-content').innerHTML = `<div class="lightbox-emoji">${g.emoji}</div><div class="lightbox-name">${g.label}</div>`;
+  }
+  document.getElementById('lb-close').onclick = () => document.getElementById('lightbox').classList.remove('open');
+  document.getElementById('lb-prev').onclick = () => { currentLbIndex = (currentLbIndex - 1 + galleryItems.length) % galleryItems.length; showLb(); };
+  document.getElementById('lb-next').onclick = () => { currentLbIndex = (currentLbIndex + 1) % galleryItems.length; showLb(); };
+  document.addEventListener('keydown', e => {
+    if (!document.getElementById('lightbox').classList.contains('open')) return;
+    if (e.key === 'ArrowLeft') { currentLbIndex = (currentLbIndex-1+galleryItems.length)%galleryItems.length; showLb(); }
+    if (e.key === 'ArrowRight') { currentLbIndex = (currentLbIndex+1)%galleryItems.length; showLb(); }
+    if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open');
+  });
+
+  // Reviews (infinite scroll, duplicated)
+  (function renderReviews() {
+    const allRevs = [...reviews, ...reviews];
+    document.getElementById('reviews-track').innerHTML = allRevs.map(r => `
+      <div class="review-card">
+        <div class="review-stars">${'★'.repeat(r.stars)}</div>
+        <p class="review-text">"${r.text}"</p>
+        <div class="reviewer">
+          <div class="reviewer-avatar">${r.name.charAt(0)}</div>
+          <div><p class="reviewer-name">${r.name}</p><p class="reviewer-meta">${r.meta}</p></div>
+        </div>
+      </div>`).join('');
+  })();
+
+  // Journey Timeline
+  (function renderTimeline() {
+    document.getElementById('timeline').innerHTML = journeySteps.map(s => `
+      <div class="t-step reveal">
+        <div class="t-icon-wrap">${s.icon}</div>
+        <div class="t-content">
+          <div class="t-label">${s.label}</div>
+          <div class="t-desc">${s.desc}</div>
+        </div>
+      </div>`).join('');
+  })();
+
+  // Occasion pills
+  document.querySelectorAll('.occ-pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.occ-pill').forEach(pp => pp.classList.remove('active'));
+      p.classList.add('active');
+      selectedOccasion = p.dataset.occ;
+    });
+  });
+
+  // Set min date for reservation
+  document.getElementById('res-date').min = new Date().toISOString().split('T')[0];
+
+  // Reservation submit
+  function submitReservation(e) {
+    e.preventDefault();
+    const fname = document.getElementById('res-fname').value;
+    const lname = document.getElementById('res-lname').value;
+    const date = document.getElementById('res-date').value;
+    const time = document.getElementById('res-time').value;
+    const guests = document.getElementById('res-guests').value;
+    const seat = document.getElementById('res-seat').value;
+    const phone = document.getElementById('res-phone').value;
+    document.getElementById('booking-summary').innerHTML = `
+      <div class="booking-summary-row"><span class="bs-label">Guest</span><span class="bs-val">${fname} ${lname}</span></div>
+      <div class="booking-summary-row"><span class="bs-label">Date</span><span class="bs-val">${date}</span></div>
+      <div class="booking-summary-row"><span class="bs-label">Time</span><span class="bs-val">${time}</span></div>
+      <div class="booking-summary-row"><span class="bs-label">Guests</span><span class="bs-val">${guests}</span></div>
+      <div class="booking-summary-row"><span class="bs-label">Seating</span><span class="bs-val">${seat}</span></div>
+      ${selectedOccasion ? `<div class="booking-summary-row"><span class="bs-label">Occasion</span><span class="bs-val">${selectedOccasion}</span></div>` : ''}
+      <div class="booking-summary-row"><span class="bs-label">Contact</span><span class="bs-val">${phone}</span></div>`;
+    document.getElementById('booking-modal').classList.add('open');
+    e.target.reset();
+    document.querySelectorAll('.occ-pill').forEach(p => p.classList.remove('active'));
+    selectedOccasion = '';
+  }
+
+  // Parallax hero on mousemove
+  document.getElementById('hero').addEventListener('mousemove', e => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 10;
+    document.querySelector('.hero-content').style.transform = `translate(${x*0.3}px, ${y*0.3}px)`;
+    document.querySelector('.city-skyline').style.transform = `translateX(${x*0.5}px)`;
+  });
+  </script>
+</body>
+</html>
