@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LUMINA SKYDINING — Dine Above the City Lights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- SCROLL PROGRESS -->
+  <div id="scroll-progress"></div>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="logo-reveal" id="loader-letters"></div>
+    <div class="loader-line"></div>
+    <div class="tagline-reveal">Rooftop Fine Dining · Hyderabad</div>
+  </div>
+
+  <!-- WEATHER SUGGESTION -->
+  <div id="weather-suggestion">
+    🌙 <span>Tonight's pick:</span> Black Truffle Risotto pairs perfectly with the cool evening air.
+  </div>
+
+  <!-- OFFER BANNER -->
+  <div id="offer-banner">
+    <span class="offer-text">✨ <span>20% OFF</span> on all bookings this weekend · Use code <span>LUMINA20</span></span>
+    <button class="offer-close" onclick="document.getElementById('offer-banner').style.display='none'">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo">Lumina</a>
+    <ul class="nav-links">
+      <li><a href="#about">Our Story</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#chef">Chef</a></li>
+      <li><a href="#reviews">Reviews</a></li>
+      <li><a href="#reservation">Reserve</a></li>
+    </ul>
+    <a href="#reservation" class="nav-cta">Reserve a Table</a>
+    <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE NAV -->
+  <div id="mobile-nav">
+    <a href="#about" class="mob-link">Our Story</a>
+    <a href="#menu" class="mob-link">Menu</a>
+    <a href="#gallery" class="mob-link">Gallery</a>
+    <a href="#chef" class="mob-link">Chef</a>
+    <a href="#reviews" class="mob-link">Reviews</a>
+    <a href="#reservation" class="mob-link">Reserve</a>
+  </div>
+
+  <!-- AMBIENCE SWITCHER -->
+  <div id="ambience-switcher">
+    <button class="amb-btn" data-mode="night" title="Night">🌙</button>
+    <button class="amb-btn" data-mode="sunset" title="Sunset">🌇</button>
+    <button class="amb-btn" data-mode="day" title="Day">☀️</button>
+  </div>
+
+  <!-- ══ HERO ══ -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="stars" id="stars"></div>
+    <div class="city-skyline"></div>
+    <div class="city-lights"></div>
+
+    <div class="hero-content">
+      <p class="hero-eyebrow">Hyderabad's Premier Rooftop Dining</p>
+      <h1 class="hero-title">Dine Above<br><em>the City Lights</em></h1>
+      <p class="hero-sub">An evening you will never forget</p>
+      <div class="hero-actions">
+        <a href="#reservation" class="btn-gold">Reserve a Table</a>
+        <a href="#menu" class="btn-outline">Explore Menu</a>
+      </div>
+    </div>
+
+    <div class="hero-status">
+      <div class="status-pill open" id="open-status">
+        <span class="status-dot"></span>
+        <span id="open-text">Open Now</span>
+      </div>
+      <div id="current-time"></div>
+    </div>
+
+    <div class="scroll-indicator">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ══ TODAY'S SPECIAL ══ -->
+  <div id="todays-special">
+    <div class="container">
+      <div class="special-inner reveal">
+        <div class="special-left">
+          <span class="special-tag">🌟 Today's Special</span>
+          <h2 class="special-dish" id="special-dish">Truffle Butter Lobster</h2>
+          <p class="special-desc" id="special-desc">Fresh Atlantic lobster, slow-cooked in a rich truffle butter sauce, served with saffron risotto and micro herbs.</p>
+          <p class="special-price" id="special-price">₹ 2,800</p>
+        </div>
+        <div class="special-emoji" id="special-emoji">🦞</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ABOUT ══ -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-image-wrap reveal-left">
+          <div class="about-img-main">🌃</div>
+          <div class="about-img-badge">
+            <span class="year">12</span>
+            <span class="since">Years</span>
+          </div>
+        </div>
+        <div class="about-content reveal-right">
+          <span class="section-eyebrow">Our Story</span>
+          <h2 class="section-title">Where Every<br><em>Meal Becomes</em><br>A Memory</h2>
+          <div class="section-line"></div>
+          <div class="about-text">
+            <p>Perched 22 floors above the bustling streets of Hyderabad, LUMINA SKYDINING was born from a singular vision — to create a dining destination that transcends the ordinary.</p>
+            <p>Our culinary team, led by Executive Chef Arjun Mehta, blends the finest global techniques with the rich heritage of Indian flavours, crafting dishes that tell a story with every bite.</p>
+            <p>From the moment you step into our rooftop haven, the city skyline becomes your backdrop, the stars your ceiling, and the food — a journey you will savour long after the last course.</p>
+          </div>
+          <div class="about-stats">
+            <div class="about-stat"><p class="num">22F</p><p class="label">Rooftop Level</p></div>
+            <div class="about-stat"><p class="num">200+</p><p class="label">Signature Dishes</p></div>
+            <div class="about-stat"><p class="num">50K+</p><p class="label">Happy Guests</p></div>
+            <div class="about-stat"><p class="num">12</p><p class="label">Awards Won</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MENU ══ -->
+  <section id="menu">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-eyebrow">Culinary Creations</span>
+        <h2 class="section-title">Our <em>Signature</em> Menu</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="menu-filters reveal">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="starters">Starters</button>
+        <button class="filter-btn" data-filter="mains">Mains</button>
+        <button class="filter-btn" data-filter="desserts">Desserts</button>
+        <button class="filter-btn" data-filter="drinks">Drinks</button>
+      </div>
+      <div class="menu-grid" id="menu-grid"></div>
+    </div>
+  </section>
+
+  <!-- ══ CHEF WHEEL ══ -->
+  <div id="wheel-section">
+    <div class="container">
+      <div class="wheel-inner">
+        <div class="reveal" style="text-align:center">
+          <span class="section-eyebrow">Chef's Pick</span>
+          <h2 class="section-title"><em>Surprise</em> Me</h2>
+          <p style="font-size:0.85rem;color:var(--text-muted);max-width:400px;margin:0 auto 2rem">Can't decide? Spin the wheel and let Chef Arjun choose your next favourite dish.</p>
+        </div>
+        <div class="wheel-container">
+          <div class="wheel-pointer"></div>
+          <div id="spin-wheel" onclick="spinWheel()">🍽️</div>
+        </div>
+        <button class="btn-gold" onclick="spinWheel()" style="margin-top:1rem">🎲 Spin the Wheel</button>
+        <div id="wheel-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIRTUAL TABLE PREVIEW ══ -->
+  <section id="table-preview">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-eyebrow">Choose Your Experience</span>
+        <h2 class="section-title">Virtual <em>Table</em> Preview</h2>
+        <div class="section-line"></div>
+        <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:3rem;max-width:500px">Select your preferred seating and preview the experience before you arrive.</p>
+      </div>
+      <div class="table-options" id="table-options"></div>
+      <div id="table-visual">
+        <div class="tv-emoji">🪑</div>
+        <div class="tv-name">Select a Table Above</div>
+        <div class="tv-desc">Choose from our exclusive seating options to preview your dining experience.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ GALLERY ══ -->
+  <section id="gallery">
+    <div class="container">
+      <div class="reveal">
+        <span class="section-eyebrow">Visual Stories</span>
+        <h2 class="section-title">The <em>Gallery</em></h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="gallery-grid" id="gallery-grid"></div>
+    </div>
+  </section>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox">
+    <button class="lightbox-close" id="lb-close"><i class="fa-solid fa-xmark"></i></button>
+    <button class="lightbox-nav" id="lb-prev"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="lightbox-content" id="lb-content"></div>
+    <button class="lightbox-nav" id="lb-next"><i class="fa-solid fa-chevron-right"></i></button>
+  </div>
+
+  <!-- ══ CHEF ══ -->
+  <section id="chef">
+    <div class="container">
+      <div class="chef-grid">
+        <div class="chef-portrait reveal-left">
+          <div class="chef-img">👨‍🍳
+            <div class="chef-award">
+              <div class="award-icon">⭐</div>
+              <div class="award-text">Michelin Recommended</div>
+            </div>
+            <div class="chef-award">
+              <div class="award-icon">🏆</div>
+              <div class="award-text">Chef of the Year 2023</div>
+            </div>
+          </div>
+        </div>
+        <div class="chef-info reveal-right">
+          <span class="section-eyebrow">The Artist</span>
+          <p class="chef-title">Executive Chef</p>
+          <h2 class="chef-name">Arjun Mehta</h2>
+          <blockquote class="chef-quote">
+            "Cooking is not just a skill — it is a conversation between the chef and the soul of the ingredient."
+          </blockquote>
+          <div class="about-text">
+            <p>With over 18 years of culinary mastery spanning Paris, Tokyo, and New York, Chef Arjun returned to his roots in Hyderabad to create something truly extraordinary — a menu that honours tradition while fearlessly embracing innovation.</p>
+            <p>His signature style — elegant minimalism with explosive flavour — has earned LUMINA a place among India's top 10 fine dining restaurants for three consecutive years.</p>
+          </div>
+          <a href="#menu" class="btn-outline" style="display:inline-block;margin-top:1.5rem">Explore His Creations</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ REVIEWS ══ -->
+  <section id="reviews">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:4rem">
+        <span class="section-eyebrow">Guest Voices</span>
+        <h2 class="section-title">What Our <em>Guests</em> Say</h2>
+        <div class="section-line" style="margin:0 auto 0"></div>
+      </div>
+    </div>
+    <div class="reviews-track-wrap">
+      <div class="reviews-track" id="reviews-track"></div>
+    </div>
+  </section>
+
+  <!-- ══ CUSTOMER JOURNEY ══ -->
+  <section id="journey">
+    <div class="container">
+      <div class="reveal" style="text-align:center;margin-bottom:4rem">
+        <span class="section-eyebrow">The Experience</span>
+        <h2 class="section-title">Your <em>Evening</em> at Lumina</h2>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </section>
+
+  <!-- ══ RESERVATION ══ -->
+  <section id="reservation">
+    <div class="container">
+      <div class="reservation-grid">
+        <div class="res-info reveal-left">
+          <span class="section-eyebrow">Book a Table</span>
+          <h2 class="section-title">Reserve Your<br><em>Rooftop</em> Experience</h2>
+          <div class="section-line"></div>
+          <p>Whether it's an intimate dinner for two or a grand celebration, we craft every evening to be uniquely yours. Reservations are recommended to guarantee your preferred table.</p>
+          <div class="res-detail">
+            <i class="fa-regular fa-clock res-detail-icon"></i>
+            <div class="res-detail-text">
+              <p class="rd-label">Opening Hours</p>
+              <p class="rd-val">Mon – Fri: 6:00 PM – 12:00 AM</p>
+              <p class="rd-val">Sat – Sun: 5:00 PM – 1:00 AM</p>
+            </div>
+          </div>
+          <div class="res-detail">
+            <i class="fa-solid fa-location-dot res-detail-icon"></i>
+            <div class="res-detail-text">
+              <p class="rd-label">Location</p>
+              <p class="rd-val">22nd Floor, The Lumina Tower</p>
+              <p class="rd-val">Banjara Hills, Hyderabad – 500034</p>
+            </div>
+          </div>
+          <div class="res-detail">
+            <i class="fa-solid fa-phone res-detail-icon"></i>
+            <div class="res-detail-text">
+              <p class="rd-label">Reservations</p>
+              <p class="rd-val">+91 40 6600 7700</p>
+              <p class="rd-val">hello@luminaskydining.com</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="res-form reveal-right">
+          <form id="reservation-form" onsubmit="submitReservation(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" id="res-fname" placeholder="Arjun" required />
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" id="res-lname" placeholder="Mehta" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="res-date" required />
+              </div>
+              <div class="form-group">
+                <label>Time</label>
+                <select id="res-time" required>
+                  <option value="">Select time</option>
+                  <option>6:00 PM</option><option>6:30 PM</option>
+                  <option>7:00 PM</option><option>7:30 PM</option>
+                  <option>8:00 PM</option><option>8:30 PM</option>
+                  <option>9:00 PM</option><option>9:30 PM</option>
+                  <option>10:00 PM</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Guests</label>
+                <select id="res-guests" required>
+                  <option value="">Select</option>
+                  <option>1 Guest</option><option>2 Guests</option>
+                  <option>3 Guests</option><option>4 Guests</option>
+                  <option>5 Guests</option><option>6+ Guests</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="res-phone" placeholder="+91 98765 43210" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Seating Preference</label>
+              <select id="res-seat">
+                <option>Window Table</option>
+                <option>Rooftop Open Air</option>
+                <option>Private Booth</option>
+                <option>VIP Lounge</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Special Occasion</label>
+              <div class="occasion-pills" id="occasion-pills">
+                <button type="button" class="occ-pill" data-occ="Birthday 🎂">Birthday 🎂</button>
+                <button type="button" class="occ-pill" data-occ="Anniversary ❤️">Anniversary ❤️</button>
+                <button type="button" class="occ-pill" data-occ="Business 💼">Business 💼</button>
+                <button type="button" class="occ-pill" data-occ="Proposal 💍">Proposal 💍</button>
+                <button type="button" class="occ-pill" data-occ="None">Just Dining</button>
+              </div>
+            </div>
+            <button type="submit" class="form-submit">Confirm Reservation</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING MODAL -->
+  <div id="booking-modal">
+    <div class="booking-card">
+      <div class="booking-check">✨</div>
+      <h3>Reservation Confirmed!</h3>
+      <p>Your table has been reserved. We look forward to welcoming you to LUMINA SKYDINING.</p>
+      <div class="booking-summary" id="booking-summary"></div>
+      <button class="btn-gold" onclick="document.getElementById('booking-modal').classList.remove('open')" style="width:100%">
+        Wonderful, Thank You!
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <p class="brand-name">Lumina</p>
+          <p class="brand-tag">Skydining · Hyderabad</p>
+          <p>Perched 22 floors above the city, LUMINA offers an unparalleled fine dining experience where world-class cuisine meets the breathtaking Hyderabad skyline.</p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Experience</h4>
+          <ul>
+            <li><a href="#menu">Our Menu</a></li>
+            <li><a href="#table-preview">Table Preview</a></li>
+            <li><a href="#gallery">Gallery</a></li>
+            <li><a href="#chef">Meet the Chef</a></li>
+            <li><a href="#journey">Guest Journey</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Visit Us</h4>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-location-dot"></i>
+            <span>22nd Floor, Lumina Tower, Banjara Hills, Hyderabad</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-solid fa-phone"></i>
+            <span>+91 40 6600 7700</span>
+          </div>
+          <div class="footer-contact-item">
+            <i class="fa-regular fa-envelope"></i>
+            <span>hello@luminaskydining.com</span>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Newsletter</h4>
+          <p style="font-size:0.78rem;color:var(--text-muted);line-height:1.6;margin-bottom:0.75rem">Get exclusive offers and seasonal menu updates.</p>
+          <div class="newsletter-form">
+            <input type="email" placeholder="your@email.com" />
+            <button onclick="alert('Thank you for subscribing!')">→</button>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 <span>LUMINA SKYDINING</span>. All rights reserved.</p>
+        <p>Crafted with <span>♥</span> · Future Interns Project</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- BACK TO TOP -->
+  <button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <i class="fa-solid fa-chevron-up"></i>
+  </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
